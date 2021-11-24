@@ -1,4 +1,5 @@
 import csv
+import time
 
 def checkFileExistance(filePath):
     try:
@@ -101,7 +102,10 @@ def link_subandstu():
 				print("-------------------------")
 				esami.append({
 					"IDStudente": input("IDStudente: "),
-					"IDMateria": input("IDMateria: ")
+					"IDMateria": input("IDMateria: "),
+					"IDEsame": i+1,
+					"Esito": "NON SVOLTO",
+					"Orario" : "",
 				})
 				while (esami[i]["IDStudente"] < minindex or esami[i]["IDStudente"] >maxindex):
 					esami[i]["IDStudente"] = input("Non esiste studente con questo ID reinseriscilo >>> ")
@@ -112,11 +116,41 @@ def link_subandstu():
 		except:
 			print("Errore")
 
+def assign_mark():
+	file = open("esami.csv")
+	csvreader = csv.reader(file)
+	header = next(csvreader)
+	rows = []
+	for row in csvreader:
+		rows.append(row)
+	file.close()
+	minindex = 0
+	maxindex = len(rows)-1
 
+	while True:
+		try:
+			for i in range(len(rows)):
+				print("\n")
+				for j in range(len(rows[0])):
+					print(header[j]+" : "+rows[i][j])
+					
+			n = int(input("Inserisci l'ID dell'esame da registrare : "))
+			while n < minindex +1 or n > maxindex +1:
+				print("Non esiste un esame con questo ID reinseriscilo ")
+				n = input("Inserisci l'ID dell'esame da registrare : ")
+			voto = int(input("Inserisci voto dell'esame ( >=18 e <= 30 ) : "))
+			while voto < 18 or voto > 30 :
+				voto = input("Inserisci voto dell'esame ( >=18 e <= 30 ) : ")
+			rows[n-1][3] = voto
+			rows[n-1][4] = time.strftime("%d/%B/%Y"+ " "+"%H:%M:%S")
+			if (input("\nVuoi modificare un'altro esame (schiaccia 1 per sì) : ") != "1"):
+				return rows
+		except:
+			print("Error!")
 
-command = input("Quale file vuoi sovrascrivere? (1 per studenti , 2 per materie, 3 per esami, 4 per aggiungere uno studente al file studenti) >>> ")
-while (command != "1" and command != "2" and command != "3" and command != "4"):
-	command = input("Input non valido , inserire 1 o 2 o 3 o 4 >>> ")
+command = input("Quale file vuoi sovrascrivere? (1 per studenti , 2 per materie, 3 per esami, 4 per aggiungere uno studente al file studenti, 5 per scrivere l'esito di un esame) >>> ")
+while (command != "1" and command != "2" and command != "3" and command != "4" and command != "5"):
+	command = input("Input non valido , inserire 1 o 2 o 3 o 4 o 5 >>> ")
 if command == "4":
 	newStudent()
 	exit()
@@ -128,6 +162,7 @@ if ( command == "1"):
 	print("Programma chiuso ...")
 elif (command == "2"):
 	list = make_matfile()
+
 	csv = "Materia,IDMateria"
 	print("Programma chiuso ...")
 elif (command == "3" ):
@@ -135,8 +170,16 @@ elif (command == "3" ):
 		print("Mancano i requisiti sufficienti per creare la tabella esami , controlla l'esistenza dei file materie.csv e people.csv")
 		exit()
 	list = link_subandstu()
-	csv = "IDStudente,IDMateria"
+	csv = "IDStudente,IDMateria,IDEsame,Esito,Orario"
 	print("Programma chiuso ...")
+elif (command == "5"):
+	if checkFileExistance("./esami.csv") == False :
+		print("Mancano i requisiti sufficienti per modificare la tabella esami , controlla l'esistenza del file esami.csv")
+		exit()
+	list = assign_mark()
+	csv = "IDStudente,IDMateria,IDEsame,Esito,Orario"
+	print("Programma chiuso ...")
+	
 
 for p in list:
 	if (command == "1"):
@@ -144,17 +187,20 @@ for p in list:
 	elif command == "2":
 		csv += "\n{},{}".format(p["Materia"], p["IDMateria"])
 	elif command == "3" :
-		csv += "\n{},{}".format(p["IDStudente"],p["IDMateria"])
+		csv += "\n{},{},{},{},{}".format(p["IDStudente"],p["IDMateria"],p["IDEsame"],p["Esito"],p["Orario"])
+	elif command == "5" :
+		csv += "\n{},{},{},{},{}".format(p[0],p[1],p[2],p[3],p[4])
 if command == "1":
 	f = open("people.csv", "w")
 	f.write(csv)
 elif command == "2" :
 	f = open("materie.csv", "w")
+
 	f.write(csv)
-elif command == "3" :
+elif command == "3" or command == "5" :
 	f = open("esami.csv","w")
 	f.write(csv)
 
-f.write(csv)
+
 
 f.close()
