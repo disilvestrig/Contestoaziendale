@@ -1,5 +1,24 @@
 import csv
 
+
+
+def newStudent():
+    print("\n")
+    file = open("people.csv")
+    csvreader = csv.reader(file)
+    header = next(csvreader)
+    rows = []
+    for row in csvreader:
+        rows.append(row)
+    file.close()
+    file = open("people.csv", "a")
+    name = input("Nome del nuovo studente: ")
+    surname = input("Cognome del nuovo studente: ")
+    newStudentNumber = len(rows) + 1
+    
+    file.write("\n" + name + "," + surname + "," + str(newStudentNumber))
+    print("Studente registrato con successo!\n")
+    file.close()
 def get_people():
 	people = []
 	while True:
@@ -86,9 +105,13 @@ def link_subandstu():
 
 
 
-command = input("Quale file vuoi sovrascrivere? (1 per studenti , 2 per materie, 3 per esami) >>> ")
-while (command != "1" and command != "2" and command != "3"):
-	command = input("Input non valido , inserire 1 o 2 o 3 >>> ")
+command = input("Quale file vuoi sovrascrivere? (1 per studenti , 2 per materie, 3 per esami, 4 per aggiungere uno studente al file studenti) >>> ")
+while (command != "1" and command != "2" and command != "3" and command != "4"):
+	command = input("Input non valido , inserire 1 o 2 o 3 o 4 >>> ")
+if command == "4":
+	newStudent()
+	exit()
+
 
 if ( command == "1"):
 	list = get_people()
@@ -98,7 +121,7 @@ elif (command == "2"):
 	list = make_matfile()
 	csv = "Materia,IDMateria"
 	print("Programma chiuso ...")
-else:
+elif (command == "3"):
 	list = link_subandstu()
 	csv = "IDStudente,IDMateria"
 	print("Programma chiuso ...")
@@ -108,14 +131,18 @@ for p in list:
 		csv += "\n{},{},{}".format(p["Nome"], p["Cognome"], p["Matricola"])
 	elif command == "2":
 		csv += "\n{},{}".format(p["Materia"], p["IDMateria"])
-	else :
+	elif command == "3" :
 		csv += "\n{},{}".format(p["IDStudente"],p["IDMateria"])
 if command == "1":
 	f = open("people.csv", "w")
+	f.write(csv)
 elif command == "2":
 	f = open("materie.csv", "w")
-else :
+	f.write(csv)
+elif command == "3" :
 	f = open("esami.csv","w")
+	f.write(csv)
+
 f.write(csv)
 
 f.close()
