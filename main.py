@@ -1,6 +1,13 @@
 import csv
 
-
+def checkFileExistance(filePath):
+    try:
+        with open(filePath, 'r') as f:
+            return True
+    except FileNotFoundError as e:
+        return False
+    except IOError as e:
+        return False
 
 def newStudent():
     print("\n")
@@ -25,8 +32,9 @@ def get_people():
 		try:
 			n = int(input("Quante persone(1-10)? "))
 
-			if n <= 0 or n > 10:
+			while n <= 0 or n > 10:
 				print("Devi inserire un numero da 1 a 10")
+				n = int(input("Quante persone(1-10)? "))
 			else:
 				for i in range(n):
 					print("-------------------------")
@@ -44,8 +52,9 @@ def make_matfile():
 		try:
 			n = int(input("Quante materie(1-10)? "))
 
-			if n <= 0 or n > 10:
+			while n <= 0 or n > 10:
 				print("Devi inserire un numero da 1 a 10")
+				n = int(input("Quante materie(1-10)? "))
 			else:
 				for i in range(n):
 					print("-------------------------")
@@ -121,7 +130,10 @@ elif (command == "2"):
 	list = make_matfile()
 	csv = "Materia,IDMateria"
 	print("Programma chiuso ...")
-elif (command == "3"):
+elif (command == "3" ):
+	if checkFileExistance("./materie.csv") == False or checkFileExistance("./people.csv") == False:
+		print("Mancano i requisiti sufficienti per creare la tabella esami , controlla l'esistenza dei file materie.csv e people.csv")
+		exit()
 	list = link_subandstu()
 	csv = "IDStudente,IDMateria"
 	print("Programma chiuso ...")
@@ -136,7 +148,7 @@ for p in list:
 if command == "1":
 	f = open("people.csv", "w")
 	f.write(csv)
-elif command == "2":
+elif command == "2" :
 	f = open("materie.csv", "w")
 	f.write(csv)
 elif command == "3" :
