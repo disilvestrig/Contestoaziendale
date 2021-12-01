@@ -6,6 +6,16 @@ markrows = []
 peoplerows = []
 subrows = []
 header = ['IDStudente', 'IDMateria', 'IDEsame', 'Esito', 'Orario']
+def readcsv(nomefile):
+    file = open(nomefile)
+    csvreader = csv.reader(file)
+    header = next(csvreader)
+    rows = []
+    for row in csvreader:
+        rows.append(row)
+    file.close()
+    return rows
+
 def checkFileExistance(filePath):
     try:
         with open(filePath, 'r') as f:
@@ -14,7 +24,15 @@ def checkFileExistance(filePath):
         return False
     except IOError as e:
         return False
-    
+
+if (checkFileExistance("people.csv") == True):
+    peoplerows = readcsv("people.csv")
+if (checkFileExistance("materie.csv") == True):
+    subrows = readcsv("materie.csv")
+if (checkFileExistance("esami.csv") == True):
+    markrows = readcsv("esami.csv")
+    print(markrows)
+
 def get_people():
     people = []
     while True:
@@ -61,38 +79,33 @@ def link_subandstu():
     print("\n")
     
     minindex = 1
-    print(peoplerows)
     maxindex = len(peoplerows)
 
     esami = []
 
     minindex2 = 1
     maxindex2 = len(subrows)
-    print(minindex,minindex2,maxindex,maxindex2)
 
-    try:
+    n = int(input("Inserisci numero di esami: "))
+    while n <= 0 or n > 10:
+        print("Devi inserire un numero da 1 a 10")
         n = int(input("Inserisci numero di esami: "))
-        while n <= 0 or n > 10:
-            print("Devi inserire un numero da 1 a 10")
-            n = int(input("Inserisci numero di esami: "))
         
-        for i in range(n):
-            print("-------------------------")
-            esami.append({
-                "IDStudente": input("IDStudente: "),
-                "IDMateria": input("IDMateria: "),
-                "IDEsame": i+1,
-                "Esito": "NON SVOLTO",
-                "Orario" : "",
-            })
-            while (esami[i]["IDStudente"] < minindex or esami[i]["IDStudente"] >maxindex):
-                esami[i]["IDStudente"] = input("Non esiste studente con questo ID reinseriscilo >>> ")
-            while (esami[i]["IDMateria"] < minindex2 or esami[i]["IDMateria"] > maxindex2):
-                
-                esami[i]["IDMateria"] = input("Non esiste materia con questo ID reinseriscilo >>> ")
-        return esami
-    except:
-        print("Errore")
+    for i in range(n):
+        print("-------------------------")
+        esami.append({
+            "IDStudente": input("IDStudente: "),
+            "IDMateria": input("IDMateria: "),
+            "IDEsame": i+1,
+            "Esito": "NON SVOLTO",
+            "Orario" : " ",
+        })
+        while (int(esami[i]["IDStudente"]) < minindex or int(esami[i]["IDStudente"]) >maxindex):
+            esami[i]["IDStudente"] = input("Non esiste studente con questo ID reinseriscilo >>> ")
+        while (int(esami[i]["IDMateria"]) < minindex2 or int(esami[i]["IDMateria"]) > maxindex2):
+            
+            esami[i]["IDMateria"] = input("Non esiste materia con questo ID reinseriscilo >>> ")
+    return esami
 
 def viewFile():
     import csv
@@ -134,23 +147,15 @@ def show_exams(n):
     import csv
     esami=[]
     exams=[]
-    file = open("esami.csv")
-    csvreader = csv.reader(file)
-    header = next(csvreader)
-    rows = []
-    for row in csvreader:
-        rows.append(row)
-    file.close()
-    file2 = open("materie.csv")
-    csvreader2 = csv.reader(file2)
-    header2 = next(csvreader2)
-    rows2 = []
-    for row in csvreader2:
-        rows2.append(row)
-    file2.close()
-    for i in rows:
-        if i[0] == n:
-            esami.append([i[1],0])
+    for i in markrows:
+
+        try:
+            if int(i["IDStudente"]) == n:
+                esami.append([i["IDMateria"],0])
+        except:
+            if (int(i[0]) == n):
+                esami.append([i[1],0])
+    print(esami)
     for i in (esami):
         for j in (esami):
             if (i[0] == j[0]):
@@ -160,12 +165,17 @@ def show_exams(n):
     [uniquelist_exams.append(x) for x in exams if x not in uniquelist_exams]
     print("ESAMI MANCANTI : ")
     for i in uniquelist_exams:
-        for j in rows2:
-            if i[0] == j[1]:
-                print(str(j[0])+" x"+str(i[1]))
+        for j in subrows:
+            try:
+                if int(i[0]) == j["IDMateria"]:
+                    print(str(j["Materia"]+" x"+str(i[1])))
+            except:
+                if i[0] == j[1]:
+                    print(str(j[0])+" x"+str(i[1]))
 
 
 def newStudent():
+    import csv
     print("\n")
     file = open("people.csv")
     csvreader = csv.reader(file)
@@ -185,6 +195,7 @@ def newStudent():
     file.close()
     
 def make_payfile():
+    import csv
     file = open("esami.csv")
     csvreader = csv.reader(file)
     header = next(csvreader)
@@ -206,12 +217,6 @@ def assign_mark():
     import csv
     global count
     global header
-    if count == 0 :
-        file = open("esami.csv")
-        csvreader = csv.reader(file)
-        for row in csvreader:
-            markrows.append(row)
-        file.close()
     
     count += 1
     minindex = 0
@@ -220,11 +225,12 @@ def assign_mark():
     for i in range(len(markrows)):
         print("\n")
         for j in range(len(markrows[0])):
-            if i == 0:    
-                break
             print(header[j],end = "")
             print(" : ",end = "")
-            print(markrows[i][j])
+            try:
+                print(markrows[i][j])
+            except:
+                print(markrows[i][header[j]])
     n = int(input("\nInserisci l'ID dell'esame da registrare : "))
     while n < minindex +1 or n > maxindex +1:
         print("Non esiste un esame con questo ID reinseriscilo ")
@@ -232,8 +238,13 @@ def assign_mark():
     voto = int(input("Inserisci voto dell'esame ( >=18 e <= 30 ) : "))
     while voto < 18 or voto > 30 :
         voto = int(input("Inserisci voto dell'esame ( >=18 e <= 30 ) : "))
-    markrows[n][3] = voto
-    markrows[n][4] = time.strftime("%d/%B/%Y"+ " "+"%H:%M:%S")
+    try:
+        print("CIHaihcoah")
+        markrows[n-1]["Esito"] = voto
+        markrows[n-1]["Orario"] = time.strftime("%d/%B/%Y"+ " "+"%H:%M:%S")
+    except:
+        markrows[n-1][3] = voto
+        markrows[n-1][4] = time.strftime("%d/%B/%Y"+ " "+"%H:%M:%S")
     return markrows
 
 
@@ -280,7 +291,7 @@ while True:
         print("\nOperazione eseguita!\n")
         
     elif ( command == "6"):
-        x = input("Inserisci il numero di matricola dello studente in questione: ")
+        x = int(input("Inserisci il numero di matricola dello studente in questione: "))
         show_exams(x)
         list = []
         print("\nOperazione eseguita!\n")
@@ -306,8 +317,8 @@ while True:
             print("\nProgramma chiuso ...")
             exit()
         list = assign_mark()
-        markrows = list
-        csv = ""
+
+        csv = "IDStudente,IDMateria,IDEsame,Esito,Orario"
         print("\nOperazione eseguita!\n")
         
     elif (command == "0"):
@@ -325,7 +336,10 @@ while True:
         elif command == "8":
             csv += "\n{},{}".format(p["IDEsame"], p["Costo"]+" euro")
         elif command == "9" :
-            csv += "\n{},{},{},{},{}".format(p[0],p[1],p[2],p[3],p[4])
+            try:
+                csv += "\n{},{},{},{},{}".format(p[0],p[1],p[2],p[3],p[4])
+            except:
+                csv += "\n{},{},{},{},{}".format(p["IDStudente"],p["IDMateria"],p["IDEsame"],p["Esito"],p["Orario"])
     if command == "1":
         f = open("people.csv", "w")
         f.write(csv)
