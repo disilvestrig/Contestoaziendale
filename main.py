@@ -6,6 +6,7 @@ markrows = []
 peoplerows = []
 subrows = []
 header = ['IDStudente', 'IDMateria', 'IDEsame', 'Esito', 'Orario']
+
 def readcsv(nomefile):
     file = open(nomefile)
     csvreader = csv.reader(file)
@@ -50,6 +51,10 @@ def get_people():
                         "Cognome": input("Cognome: "),
                         "Matricola": i+1
                     })
+                print(len(people))
+                fileindex = open("fileindex.txt","w")
+                fileindex.write(str(len(people)))
+                fileindex.close()
                 return people
         except:
             print("Errore!")
@@ -175,20 +180,17 @@ def show_exams(n):
 
 
 def newStudent():
-    import csv
-    print("\n")
-    file = open("people.csv")
-    csvreader = csv.reader(file)
-    header = next(csvreader)
-    rows = []
-    for row in csvreader:
-        rows.append(row)
-    file.close()
-    
+    fileindex = open("fileindex.txt","r")
+    index = fileindex.readlines()
+    print(index)
+    fileindex.close()
     file = open("people.csv", "a")
     name = input("Nome del nuovo studente: ")
     surname = input("Cognome del nuovo studente: ")
-    newStudentNumber = len(rows) + 1
+    newStudentNumber = int(index[0])+1
+    fileindex = open("fileindex.txt","w")
+    fileindex.write(str(int(index[0])+1))
+    fileindex.close()
     
     file.write("\n" + name + "," + surname + "," + str(newStudentNumber))
     print("Studente registrato con successo!\n")
