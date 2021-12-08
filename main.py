@@ -28,8 +28,10 @@ def checkFileExistance(filePath):
 
 if (checkFileExistance("people.csv") == True):
     peoplerows = readcsv("people.csv")
+    print(peoplerows)
 if (checkFileExistance("materie.csv") == True):
     subrows = readcsv("materie.csv")
+    print(subrows)
 if (checkFileExistance("esami.csv") == True):
     markrows = readcsv("esami.csv")
     print(markrows)
@@ -75,6 +77,9 @@ def make_matfile():
                         "Materia": input("Nome Materia: "),
                         "IDMateria": i+1
                     })
+                fileindex = open("fileindexmaterie.txt","w")
+                fileindex.write(str(len(materie)))
+                fileindex.close()
                 return materie
         except:
             print("Errore!")
@@ -110,6 +115,9 @@ def link_subandstu():
         while (int(esami[i]["IDMateria"]) < minindex2 or int(esami[i]["IDMateria"]) > maxindex2):
             
             esami[i]["IDMateria"] = input("Non esiste materia con questo ID reinseriscilo >>> ")
+    fileindex = open("fileindexesami.txt","w")
+    fileindex.write(str(len(esami)))
+    fileindex.close()
     return esami
 
 def viewFile():
@@ -195,6 +203,55 @@ def newStudent():
     file.write("\n" + name + "," + surname + "," + str(newStudentNumber))
     print("Studente registrato con successo!\n")
     file.close()
+
+    peoplerows.append([name,surname,str(newStudentNumber)])
+
+def newMateria():
+    fileindex = open("fileindexmaterie.txt","r")
+    index = fileindex.readlines()
+    print(index)
+    fileindex.close()
+    file = open("materie.csv", "a")
+    name = input("Nome del nuova materia: ")
+    newMateriaNumber = int(index[0])+1
+    fileindex = open("fileindexmaterie.txt","w")
+    fileindex.write(str(int(index[0])+1))
+    fileindex.close()
+    
+    file.write("\n" + name + "," + str(newMateriaNumber))
+    print("Materia registrata con successo!\n")
+    file.close()
+
+    subrows.append([name,str(newMateriaNumber)])
+
+def newEsame():
+    fileindex = open("fileindexesami.txt","r")
+    peopleindex = open("fileindex.txt","r")
+    matindex = open("fileindexmaterie.txt","r")
+    index = fileindex.readlines()
+    pind = peopleindex.readlines()
+    mind = matindex.readlines()
+    print(index)
+    fileindex.close()
+    file = open("esami.csv", "a")
+    name = int(input("IDStudente: "))
+    while name <0 or name > int(pind[0]):
+        print("Not valid")
+        name = int(input("IDStudente"))
+    mat = int(input("IDMateria: "))
+    while mat <0 or mat > int(mind[0]):
+        print("Not valid")
+        mat = int(input("IDMateria"))    
+    newExamNumber = int(index[0])+1
+    fileindex = open("fileindexesami.txt","w")
+    fileindex.write(str(int(index[0])+1))
+    fileindex.close()
+    
+    file.write("\n" + str(name) + "," + str(mat) + "," + str(newExamNumber)+ ", NON SVOLTO , ")
+    print("Esame registrata con successo!\n")
+    file.close()
+
+    markrows.append([str(name),str(mat),str(newExamNumber),"NON SVOLTO"," "])
     
 def make_payfile():
     import csv
@@ -253,30 +310,34 @@ def assign_mark():
 
 
 while True:
-    print("Menù principale: \n1 - Sovrascrivi file studenti \n2 - Sovrascrivi file materie \n3 - Sovrascrivi file esami \n4 - Visualizza elenco studenti\n5 - Visualizza dati studente\n6 - Visualizza esami da sostenere dallo studente\n7 - Aggiungi un nuovo studente al file studenti già esistente\n8 - Inserisci il costo di ogni esame\n9 - Scrivi l'esito di un esame\n0 - Esci\n ")
+    print("Menù principale: \n1 - Sovrascrivi file studenti \n2 - Sovrascrivi file materie \n3 - Sovrascrivi file esami \n4 - Visualizza elenco studenti\n5 - Visualizza dati studente\n6 - Visualizza esami da sostenere dallo studente\n7 - Aggiungi un nuovo studente al file studenti già esistente\n8 - Inserisci il costo di ogni esame\n9 - Scrivi l'esito di un esame\n0 - Esci\n10 - Aggiungi materia\n11 - Aggiungi esame\n ")
         
     command = input("\nInserisci il numero dell'opzione che si desidera effettuare: ")
-    while (command != "1" and command != "2" and command != "3" and command != "4" and command != "5" and command != "6" and command != "7" and command != "8" and command != "9" and command != "0"):
-        command = input("Input non valido, inserire un numero da 0 a 9: ")
+    while (command != "1" and command != "2" and command != "3" and command != "4" and command != "5" and command != "6" and command != "7" and command != "8" and command != "9" and command != "0" and command != "10" and command != "11"):
+        command = input("Input non valido, inserire un numero da 0 a 11: ")
     os.system("clear")
 
     if ( command == "1"):
+        if checkFileExistance("./people.csv") == True:
+            print("Non puoi riscrivere da 0 il file, causerebbe errori")
+            print("Funzione bloccata ...\n")
+            continue
         list = get_people()
         csv = "Nome,Cognome,Matricola"
         peoplerows = list
         print("\nOperazione eseguita!\n")
     
     elif (command == "2"):
+        if checkFileExistance("./materie.csv") == True:
+            print("Non puoi riscrivere da 0 il file, causerebbe errori")
+            print("Funzione bloccata ...\n")
+            continue
         list = make_matfile()
         subrows = list
         csv = "Materia,IDMateria"
         print("\nOperazione eseguita!\n")
     
     elif (command == "3" ):
-        if checkFileExistance("./materie.csv") == False or checkFileExistance("./people.csv") == False:
-            print("Mancano i requisiti sufficienti per creare la tabella esami , controlla l'esistenza dei file materie.csv e people.csv")
-            print("\nProgramma chiuso ...")
-            exit()
         list = link_subandstu()
         markrows = list
         csv = "IDStudente,IDMateria,IDEsame,Esito,Orario"
@@ -326,7 +387,24 @@ while True:
     elif (command == "0"):
         print("\nProgramma chiuso ...")
         exit()
+    elif command == "10":
+        if checkFileExistance("./materie.csv") == False :
+            print("Mancano i requisiti sufficienti per modificare la tabella materie, controlla l'esistenza del file materie.csv")
+            print("\nProgramma chiuso ...")
+            continue
         
+        newMateria()
+        list = []
+        print("\nOperazione eseguita!\n")
+    elif command == "11":
+        if checkFileExistance("./esami.csv") == False :
+            print("Mancano i requisiti sufficienti per modificare la tabella esami, controlla l'esistenza del file esami.csv")
+            print("\nProgramma chiuso ...")
+            continue
+        
+        newEsame()
+        list = []
+        print("\nOperazione eseguita!\n")    
         
     for p in list:
         if (command == "1"):
