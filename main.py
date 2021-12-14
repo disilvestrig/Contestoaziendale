@@ -28,13 +28,13 @@ def checkFileExistance(filePath):
 
 if (checkFileExistance("people.csv") == True):
     peoplerows = readcsv("people.csv")
-    print(peoplerows)
+
 if (checkFileExistance("materie.csv") == True):
     subrows = readcsv("materie.csv")
-    print(subrows)
+
 if (checkFileExistance("esami.csv") == True):
     markrows = readcsv("esami.csv")
-    print(markrows)
+
 
 def get_people():
     people = []
@@ -53,7 +53,7 @@ def get_people():
                         "Cognome": input("Cognome: "),
                         "Matricola": i+1
                     })
-                print(len(people))
+
                 fileindex = open("fileindex.txt","w")
                 fileindex.write(str(len(people)))
                 fileindex.close()
@@ -168,7 +168,6 @@ def show_exams(n):
         except:
             if (int(i[0]) == n):
                 esami.append([i[1],0])
-    print(esami)
     for i in (esami):
         for j in (esami):
             if (i[0] == j[0]):
@@ -190,7 +189,6 @@ def show_exams(n):
 def newStudent():
     fileindex = open("fileindex.txt","r")
     index = fileindex.readlines()
-    print(index)
     fileindex.close()
     file = open("people.csv", "a")
     name = input("Nome del nuovo studente: ")
@@ -254,21 +252,15 @@ def newEsame():
     markrows.append([str(name),str(mat),str(newExamNumber),"NON SVOLTO"," "])
     
 def make_payfile():
-    import csv
-    file = open("esami.csv")
-    csvreader = csv.reader(file)
-    header = next(csvreader)
-    rows = []
-    for row in csvreader:
-        rows.append(row)
-    file.close()
-    
+
+    index = open("fileindexesami.txt","r")
     pagamenti = []
-    n = len(rows)
+    n = index.readlines()
+    n = int(n[0])
     for i in range(n):
         pagamenti.append({
-            "IDEsame": rows[i][2],
-            "Costo": input("Inserire cifra da pagare per l'esame con ID " + rows[i][2] + ": ")})
+            "IDEsame": i+1,
+            "Costo": input("Inserire cifra da pagare per l'esame con ID " + str(i+1) + ": ")})
         print("-------------------------")
     return pagamenti
 
@@ -310,7 +302,7 @@ def assign_mark():
 
 
 while True:
-    print("Menù principale: \n1 - Sovrascrivi file studenti \n2 - Sovrascrivi file materie \n3 - Sovrascrivi file esami \n4 - Visualizza elenco studenti\n5 - Visualizza dati studente\n6 - Visualizza esami da sostenere dallo studente\n7 - Aggiungi un nuovo studente al file studenti già esistente\n8 - Inserisci il costo di ogni esame\n9 - Scrivi l'esito di un esame\n0 - Esci\n10 - Aggiungi materia\n11 - Aggiungi esame\n ")
+    print("\u001b[92mMenù principale: \n0 - Esci\n1 - Sovrascrivi file studenti \n2 - Sovrascrivi file materie \n3 - Sovrascrivi file esami \n4 - Visualizza elenco studenti\n5 - Visualizza dati studente\n6 - Visualizza esami da sostenere dallo studente\n7 - Aggiungi un nuovo studente al file studenti già esistente\n8 - Inserisci il costo di ogni esame\n9 - Scrivi l'esito di un esame\n10 - Aggiungi materia\n11 - Aggiungi esame\n")
         
     command = input("\nInserisci il numero dell'opzione che si desidera effettuare: ")
     while (command != "1" and command != "2" and command != "3" and command != "4" and command != "5" and command != "6" and command != "7" and command != "8" and command != "9" and command != "0" and command != "10" and command != "11"):
@@ -344,6 +336,10 @@ while True:
         print("\nOperazione eseguita!\n")
     
     elif (command == "4"):
+        if checkFileExistance("./people.csv") == False :
+            print("Mancano i requisiti sufficienti per visualizzare la tabella studenti, controlla l'esistenza del file people.csv")
+            print("\nProgramma chiuso ...")
+            continue
         viewFile()
         list = []
         print("\nOperazione eseguita!\n")
